@@ -6,7 +6,7 @@ pipeline {
 
         stage ('Source') {
             steps {
-                git 'https://github.com/corazavictor666/'
+                git 'https://github.com/corazavictor666/case_3.git'
             }
         }
     }
@@ -39,9 +39,8 @@ pipeline {
         stage ('Test')
             steps {
                 script {
-                    kubernetesDeploy (configs: "kubernetes.yaml", kubeconfigID "mykubeconfig")
+                    kubernetesDeploy(configs: 'kubernetes.yaml', kubeconfigID: 'kubeconfig')
                 }
             }
     }
-
-    
+}
