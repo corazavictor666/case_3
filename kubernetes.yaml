@@ -1,20 +1,39 @@
-apiVersion: apps/v1
-kind: Devs
-metadata:
-  labels:
-    app: myWeb
-  name: myWeb
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: myWeb
-  template:
-    metadata:
-      labels:
-        app: myWeb
-    containers:
-      - name: myNginxWeb
-        image: $DOCKER_IMAGE_NAME:$BUILD_NUMBER
-        ports: 
-        - containerPort: 80
+---
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      app: myweb
+    name: myweb
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: myweb
+    template:
+      metadata:
+        labels:
+          app: myweb
+      spec:
+        containers:
+        - image: $DOCKER_IMAGE_NAME:$BUILD_NUMBER
+          imagePullPolicy: Always
+          name: myweb
+  
+  ---
+  apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: myweb
+    name: myweb
+  spec:
+    ports:
+    - nodePort: 32223
+      port: 80
+      protocol: TCP
+      targetPort: 80
+    selector:
+      app: myweb
+    type: NodePort
+  

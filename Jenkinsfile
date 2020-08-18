@@ -1,46 +1,41 @@
 pipeline {
-    
-    agent any 
 
-    stages {
+  agent any
 
-        stage ('Source') {
-            steps {
-                git 'https://github.com/corazavictor666/case_3.git'
-            }
+  stages {
+
+    stage('Checkout Source') {
+      steps {
+        git 'https://github.com/corazavictor666/case_3.git'
+      }
+    }
+
+    stage('Build image') {
+      steps{
+        script {
+          dockerImage = docker.build registry + ":$BUILD_NUMBER"
         }
+      }
     }
 
-    stages {
-
-        stage ('Build Image') {
-            steps {
-                script {
-                    dockerImage = docker.build registry + ":$BUILD_NUMBER"
-                }
-            }
+    stage('Push Image') {
+      steps{
+        script {
+          docker.withRegistry( "" ) {
+            dockerImage.push()
+          }
         }
+      }
     }
 
-    stages {
-
-        stage ('Push image')
-            steps {
-                script {
-                    docker.withRegistry ("") {
-                        dockerImage.push ()
-                    }
-                }
-            }
+    stage('Deploy App') {
+      steps {
+        script {
+          kubernetesDeploy(configs: "kubernetes.yaml", kubeconfigId: "kubeconfig")
+        }
+      }
     }
 
-    stage {
+  }
 
-        stage ('Test')
-            steps {
-                script {
-                    kubernetesDeploy(configs: 'kubernetes.yaml', kubeconfigID: 'kubeconfig')
-                }
-            }
-    }
 }
